@@ -47,6 +47,5 @@ hanoi n a b c = hanoi (n -1) a c b ++ [(a, b)] ++ hanoi (n -1) c b a
 -- ex6
 hanoi4 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
 hanoi4 0 _ _ _ _ = []
-hanoi4 n a b c d = hanoi4 x a c b d ++ hanoi y a d b ++ [(a,b)] ++ hanoi y d b a ++ hanoi4 x c b a d
-  where x = n `div` 2
-        y = n - x -1
+hanoi4 1 a b _ _ = [(a,b)]
+hanoi4 n a b c d = hanoi4 (n-2) a d b c ++ [(a,c),(a,b),(c,b)] ++ hanoi4 (n-2) d b a c
