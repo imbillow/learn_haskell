@@ -21,10 +21,11 @@ histogram = unlines . toGrid . groups
       let m = maximum $ map snd xs
        in reverse $
             transpose
-              [ intToDigit (fromIntegral y) : '=' :
+              [ intToDigit (fromIntegral y) :
+                '=' :
                 case k of
                   Nothing -> replicate m ' '
-                  Just k -> [if x <= k then '*' else ' ' | x <- [1 .. m]]
+                  Just k -> replicate k '*' ++ replicate (m - k) ' '
                 | y <- [0 .. 9],
                   let k = lookup y xs
               ]
