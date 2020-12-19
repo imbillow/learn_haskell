@@ -1,3 +1,5 @@
+import Data.List
+
 fun1 :: [Integer] -> Integer
 fun1 [] = 1
 fun1 (x : xs)
@@ -40,18 +42,29 @@ foldTree = foldr (insert 0) Leaf
 -- 3
 
 xor :: [Bool] -> Bool
-xor = undefined
+xor = foldr (/=) False
 
 map' :: (a -> b) -> [a] -> [b]
-map' = undefined
+map' _ [] = []
+map' f (x : xs) = foldr (\a b -> f a : b) [f x] xs
 
 myFoldl :: (a -> b -> a) -> a -> [b] -> a
-myFoldl = undefined
+myFoldl f base = foldr (flip f) base . reverse
 
 -- 4
 
 sieveSundaram :: Integer -> [Integer]
-sieveSundaram = undefined
+sieveSundaram n = 2 : map (\x -> x * 2 + 1) ([1 .. n] \\ remove)
+  where
+    remove =
+      sort $
+        nub
+          [ t
+            | i <- [1 .. n + 1],
+              j <- [i .. n],
+              let t = i + j + 2 * i * j,
+              t <= n
+          ]
 
 cardProd :: [a] -> [b] -> [(a, b)]
 cardProd xs ys = [(x, y) | x <- xs, y <- ys]
