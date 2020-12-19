@@ -32,12 +32,28 @@ data Tree a
   deriving (Show, Eq)
 
 foldTree :: [a] -> Tree a
-foldTree = foldr (insert 0) Leaf
-  where
-    insert d e tree =
-      case tree of
-        Leaf -> Node d Leaf e Leaf
-        Node d' left _ right -> undefined
+foldTree = foldr insertTree Leaf
+
+insertTree :: a -> Tree a -> Tree a
+insertTree e tree =
+  case tree of
+    Leaf -> Node 0 Leaf e Leaf
+    Node _ left e' right ->
+      if depth left <= depth right
+        then
+          let left' = insertTree e left
+              d = maxDepth left' right + 1
+           in Node d left' e' right
+        else
+          let right' = insertTree e right
+              d = maxDepth left right' + 1
+           in Node d left e' right'
+      where
+        depth tree =
+          case tree of
+            Node d _ _ _ -> d
+            Leaf -> -1
+        maxDepth a b = max (depth a) (depth b)
 
 -- 3
 
