@@ -72,7 +72,7 @@ ruler = interLeaveStreams zeros positives
 -- 6
 
 x :: Stream Integer
-x = undefined
+x = Cons 0 $ Cons 1 $ streamRepeat 0
 
 fibs3 :: Stream Integer
 fibs3 = undefined
