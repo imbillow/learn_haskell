@@ -1,4 +1,6 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE LambdaCase #-}
+{-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
 -- 1
 
@@ -74,10 +76,35 @@ ruler = interLeaveStreams zeros positives
 x :: Stream Integer
 x = Cons 0 $ Cons 1 $ streamRepeat 0
 
+mul (Cons x xs) s = Cons (x * s) $ mul xs s
+
+instance Num (Stream Integer) where
+  fromInteger n = Cons n $ streamRepeat 0
+  negate (Cons x xs) = Cons (- x) $ negate xs
+  (+) (Cons x xs) (Cons y ys) = Cons (x + y) $ xs + ys
+  (*) (Cons x xs') ys@(Cons y ys') = Cons (x * y) $ mul ys' x + xs' * ys
+
+instance Fractional (Stream Integer) where
+  (/) (Cons x xs') (Cons y ys') = q
+    where
+      q = Cons (x `div` y) $ mul (xs' - q * ys') (round $ 1 / fromIntegral y)
+
 fibs3 :: Stream Integer
-fibs3 = undefined
+fibs3 = x / (1 - x - x * x)
 
 -- 7
 
+data Mat2 a = Mat2 a a a a
+
+instance Num (Mat2 Integer) where
+  (Mat2 a0 a1 a2 a3) * (Mat2 b0 b1 b2 b3) =
+    Mat2
+      (a0 * b0 + a1 * b2)
+      (a0 * b1 + a1 * b3)
+      (a2 * b0 + a3 * b2)
+      (a2 * b1 + a3 * b3)
+
 fib4 :: Integer -> Integer
-fib4 = undefined
+fib4 n = y
+  where
+    Mat2 _ y _ _ = Mat2 1 1 1 0 ^ n
