@@ -1,4 +1,6 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Sized where
 
 import Data.Monoid
@@ -20,9 +22,13 @@ instance Sized Size where
 --   (Foo, (Bar, Size))
 --   ...
 -- are all instances of Sized.
-instance Sized b => Sized (a,b) where
+instance Sized b => Sized (a, b) where
   size = size . snd
 
+-- https://stackoverflow.com/questions/53622428/a-basic-monoid-definition-gives-no-instance-for-semigroup-mymonoid-arising-fr
+
+instance Semigroup Size where
+  (<>) = (+)
+
 instance Monoid Size where
-  mempty  = Size 0
-  mappend = (+)
+  mempty = Size 0
