@@ -57,3 +57,36 @@ posInt = Parser f
 ------------------------------------------------------------
 -- Your code goes below here
 ------------------------------------------------------------
+
+-- 1
+
+first :: (a -> b) -> (a, c) -> (b, c)
+first = undefined
+
+instance Functor Parser where
+  fmap = undefined
+
+-- 2
+
+instance Applicative Parser where
+  pure = undefined
+  p1 <*> p2 = undefined
+
+-- 3
+
+abParser :: Parser (Char, Char)
+abParser = undefined
+
+abParser_ :: Parser ()
+abParser_ = undefined
+
+-- 4
+
+class Applicative f => Alternative f where
+  empty :: f a
+  (<|>) :: f a -> f a -> fa
+
+-- 5
+
+intOrUppercase :: Parser ()
+intOrUppercase = undefined
