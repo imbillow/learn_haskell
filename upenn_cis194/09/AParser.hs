@@ -5,7 +5,9 @@
 module AParser where
 
 import Control.Applicative
+import Control.Monad
 import Data.Char
+import Data.Maybe
 
 -- A parser for a value of type a is a function which takes a String
 -- represnting the input to be parsed, and succeeds or fails; if it
@@ -61,32 +63,39 @@ posInt = Parser f
 -- 1
 
 first :: (a -> b) -> (a, c) -> (b, c)
-first = undefined
+first f (x, y) = (f x, y)
 
 instance Functor Parser where
-  fmap = undefined
+  fmap f (Parser g) =
+    Parser $ fmap (first f) . g
 
 -- 2
 
 instance Applicative Parser where
-  pure = undefined
-  p1 <*> p2 = undefined
+  pure x = Parser $ const $ Just (x, "")
+  Parser f1 <*> Parser f2 =
+    Parser $
+      \x -> do
+        (y, r) <- f1 x
+        (y', r') <- f2 r
+        return (y y', r')
 
 -- 3
 
 abParser :: Parser (Char, Char)
-abParser = undefined
+abParser = (,) <$> char 'a' <*> char 'b'
 
 abParser_ :: Parser ()
-abParser_ = undefined
+abParser_ = () <$ abParser
 
 -- 4
 
-class Applicative f => Alternative f where
-  empty :: f a
-  (<|>) :: f a -> f a -> fa
+instance Alternative Parser where
+  empty = Parser $ const Nothing
+  Parser f1 <|> Parser f2 =
+    Parser $ \x -> f1 x <|> f2 x
 
 -- 5
 
 intOrUppercase :: Parser ()
-intOrUppercase = undefined
+intOrUppercase = () <$ posInt <|> () <$ satisfy isUpper
