@@ -72,7 +72,7 @@ instance Functor Parser where
 -- 2
 
 instance Applicative Parser where
-  pure x = Parser $ const $ Just (x, "")
+  pure x = Parser $ \s -> Just (x, s)
   Parser f1 <*> Parser f2 =
     Parser $
       \x -> do
