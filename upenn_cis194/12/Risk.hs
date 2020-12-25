@@ -45,7 +45,7 @@ battle Battlefield {attackers = att, defenders = def} =
   do
     att' <- dies attU
     def' <- dies defU
-    let mix = zip' (sort att') (sort def')
+    let mix = zip' (reverse $ sort att') (reverse $ sort def')
         (att'', def'') = foldl addTup (att, def) $ map f mix
     return Battlefield {attackers = att'', defenders = def''}
   where
