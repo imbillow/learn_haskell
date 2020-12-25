@@ -1,8 +1,12 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module Risk where
 
 import Control.Monad.Random
+import Data.List
 
 ------------------------------------------------------------
 -- Die values
@@ -26,3 +30,41 @@ die = getRandom
 type Army = Int
 
 data Battlefield = Battlefield {attackers :: Army, defenders :: Army}
+  deriving Show
+
+-- 1
+
+-- 2
+
+dies :: Integer -> Rand StdGen [DieValue]
+dies n = replicateM (fromInteger n) die
+
+battle :: Battlefield -> Rand StdGen Battlefield
+battle Battlefield {attackers = att, defenders = def} =
+  do
+    att' <- dies attU
+    def' <- dies defU
+    let mix = zip' (sort att') (sort def')
+        (att'', def'') = foldl addTup (att, def) $ map f mix
+    return Battlefield {attackers = att'', defenders = def''}
+  where
+    attU = min 3 $ fromIntegral att - 1
+    defU = min 2 $ fromIntegral def
+    zip' x y = take (max (length x) (length y)) $ zip (x ++ repeat 0) (y ++ repeat 0)
+    f (x, y) = if x > y then (0, -1) else (-1, 0)
+    addTup (x0, y0) (x1, y1) = (x0 + x1, y0 + y1)
+
+-- 3
+
+invade :: Battlefield -> Rand StdGen Battlefield
+invade = undefined
+
+-- 4
+
+successProb :: Battlefield -> Rand StdGen Double
+successProb = undefined
+
+-- 5
+
+exactSuccessProb :: Battlefield -> Double
+exactSuccessProb = undefined

@@ -62,6 +62,6 @@ maxFun = uncurry moreFun . treeFold nextLevel
 main :: IO ()
 main = do
   text <- readFile "company.txt"
-  let GL es f = maxFun $ (read text :: Tree Employee)
+  let GL es f = maxFun (read text :: Tree Employee)
   putStrLn $ "Total fun: " ++ show f
   putStrLn $ unlines $ sort $ map empName es
