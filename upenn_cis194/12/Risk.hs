@@ -6,6 +6,7 @@
 module Risk where
 
 import Control.Monad.Random
+import Data.Functor
 import Data.List
 
 ------------------------------------------------------------
@@ -30,7 +31,7 @@ die = getRandom
 type Army = Int
 
 data Battlefield = Battlefield {attackers :: Army, defenders :: Army}
-  deriving Show
+  deriving (Show)
 
 -- 1
 
@@ -57,12 +58,17 @@ battle Battlefield {attackers = att, defenders = def} =
 -- 3
 
 invade :: Battlefield -> Rand StdGen Battlefield
-invade = undefined
+invade bat@Battlefield {attackers = att, defenders = def} =
+  if def <= 0 || att < 2
+    then return bat
+    else invade =<< battle bat
 
 -- 4
 
 successProb :: Battlefield -> Rand StdGen Double
-successProb = undefined
+successProb bat =
+  replicateM 1000 (invade bat) <&> filter ((<= 0) . defenders)
+    <&> \x -> fromIntegral (length x) / 1000
 
 -- 5
 
