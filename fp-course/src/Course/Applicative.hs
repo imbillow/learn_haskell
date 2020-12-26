@@ -55,7 +55,7 @@ instance Applicative ExactlyOne where
     ExactlyOne a ->
     ExactlyOne b
   -- (<*>) f a = f P.>>= \f' -> a P.>>= \a' -> return $ f' a'
-  (<*>) f a = f P.>>= \f' -> P.fmap f' a
+  (<*>) f a = f P.>>= (<$> a)
 
 -- | Insert into a List.
 --
@@ -73,8 +73,7 @@ instance Applicative List where
     List (a -> b) ->
     List a ->
     List b
-  (<*>) (f :. fs) a = P.fmap f a ++ (fs <*> a)
-  (<*>) _ _ = Nil
+  (<*>) f a = flatMap (`map` a) f
 
 -- | Insert into an Optional.
 --
@@ -98,8 +97,7 @@ instance Applicative Optional where
     Optional (a -> b) ->
     Optional a ->
     Optional b
-  (<*>) (Full f) (Full a) = pure $ f a
-  (<*>) _ _ = Empty
+  (<*>) f a = f P.>>= (<$> a)
 
 -- | Insert into a constant function.
 --
@@ -156,7 +154,7 @@ lift2 ::
   k a ->
   k b ->
   k c
-lift2 f a b = pure f <*> a <*> b
+lift2 f a b = f <$> a <*> b
 
 -- | Apply a ternary function in the environment.
 -- /can be written using `lift2` and `(<*>)`./
@@ -188,7 +186,7 @@ lift3 ::
   k b ->
   k c ->
   k d
-lift3 f a b c = pure f <*> a <*> b <*> c
+lift3 f a b c = lift2 f a b <*> c
 
 -- | Apply a quaternary function in the environment.
 -- /can be written using `lift3` and `(<*>)`./
@@ -221,7 +219,7 @@ lift4 ::
   k c ->
   k d ->
   k e
-lift4 f a b c d = pure f <*> a <*> b <*> c <*> d
+lift4 f a b c d = lift3 f a b c <*> d
 
 -- | Apply a nullary function in the environment.
 lift0 ::
@@ -246,7 +244,7 @@ lift1 ::
   (a -> b) ->
   k a ->
   k b
-lift1 f a = pure f <*> a
+lift1 = (<$>)
 
 -- | Apply, discarding the value of the first argument.
 -- Pronounced, right apply.
@@ -369,7 +367,7 @@ filtering ::
   (a -> k Bool) ->
   List a ->
   k (List a)
-filtering f = foldRight (\x -> lift2 (\y -> if y then (x:.) else id) $ f x) $ pure Nil
+filtering f = foldRight (\x -> lift2 (\y -> if y then (x :.) else id) $ f x) $ pure Nil
 
 -----------------------
 -- SUPPORT LIBRARIES --
