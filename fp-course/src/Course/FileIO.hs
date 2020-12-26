@@ -102,8 +102,8 @@ printFiles =
 getFile ::
   FilePath ->
   IO (FilePath, Chars)
-getFile p =
-  (,) p <$> readFile p
+getFile =
+  lift2 (<$>) (,) readFile
 
 -- Given a list of file names, return list of (file name and file contents).
 -- Use @getFile@.
@@ -111,7 +111,7 @@ getFiles ::
   List FilePath ->
   IO (List (FilePath, Chars))
 getFiles =
-   mapM getFile
+  mapM getFile
 
 -- Given a file name, read it and for each line in that file, read and print contents of each.
 -- Use @getFiles@, @lines@, and @printFiles@.
