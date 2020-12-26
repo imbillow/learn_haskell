@@ -142,7 +142,7 @@ join = (id =<<)
   k a ->
   (a -> k b) ->
   k b
-(>>=) = flip (=<<)
+(>>=) a f = join $ f <$> a
 
 infixl 1 >>=
 
