@@ -160,8 +160,10 @@ firstRepeat ::
   List a ->
   Optional a
 firstRepeat xs =
-  -- I don't understand
-  eval (findM (State . lift2 (lift2 (,)) S.member S.insert) xs) S.empty
+  eval (findM f xs) S.empty
+  where
+    f x = State $ \s ->
+      (S.member x s, S.insert x s)
 
 -- | Remove all duplicate elements in a `List`.
 -- /Tip:/ Use `filtering` and `State` with a @Data.Set#Set@.
@@ -173,8 +175,11 @@ distinct ::
   Ord a =>
   List a ->
   List a
-distinct =
-  error "todo: Course.State#distinct"
+distinct xs =
+  eval (filtering f xs) S.empty
+  where
+    f x = State $ \s ->
+      (S.notMember x s, S.insert x s)
 
 -- | A happy number is a positive integer, where the sum of the square of its digits eventually reaches 1 after repetition.
 -- In contrast, a sad number (not a happy number) is where the sum of the square of its digits never reaches 1
@@ -201,4 +206,7 @@ isHappy ::
   Integer ->
   Bool
 isHappy =
-  error "todo: Course.State#isHappy"
+  contains 1 . firstRepeat . produce square
+  where
+    square :: Integer -> Integer
+    square = P.fromIntegral . sum . map ((P.^ 2) . digitToInt) . show'
